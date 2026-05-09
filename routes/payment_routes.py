@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 
-from services.mp_service import crear_pago
+from services.mercado_pago_service import crear_pago
 from services.firebase_service import activar_plan
 
 import mercadopago
