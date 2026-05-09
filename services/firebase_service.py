@@ -151,8 +151,13 @@ def sumar_consulta(usuario):
 
     datos = obtener_datos(usuario)
 
+    consultas_actuales = datos.get(
+        "consultas",
+        0
+    )
+
     ref.update({
-        "consultas": datos["consultas"] + 1
+        "consultas": consultas_actuales + 1
     })
 
 
