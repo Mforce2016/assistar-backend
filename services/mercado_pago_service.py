@@ -1,18 +1,16 @@
 import mercadopago
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
-
-sdk = mercadopago.SDK(ACCESS_TOKEN)
+sdk = mercadopago.SDK(
+    os.getenv("MP_ACCESS_TOKEN")
+)
 
 
 # =========================================
-# CREAR PREFERENCIA MP
+# CREAR PAGO
 # =========================================
-def crear_preferencia(usuario, plan):
+
+def crear_pago(usuario, plan):
 
     precio = 12000
 
@@ -29,23 +27,16 @@ def crear_preferencia(usuario, plan):
             }
         ],
 
-        "payer": {
-            "name": usuario
-        },
+        "external_reference": f"{usuario}|{plan}",
 
-        "back_urls": {
-            "success": "https://www.jforceapps.com.ar/pago-exitoso",
-            "failure": "https://www.jforceapps.com.ar/pago-fallido",
-            "pending": "https://www.jforceapps.com.ar/pago-pendiente"
-        },
-
-        "auto_return": "approved"
+        "notification_url":
+            "https://assistar-backend.onrender.com/webhook_mp"
     }
 
-    preference_response = sdk.preference().create(preference_data)
+    preference_response = sdk.preference().create(
+        preference_data
+    )
 
     preference = preference_response["response"]
 
-    return {
-        "url": preference["init_point"]
-    }
+    return preference["init_point"]
