@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services.mercado_pago_service import crear_preferencia
+from services.mercado_pago_service import crear_preferencia
 
 payment_bp = Blueprint("payment", __name__)
 
