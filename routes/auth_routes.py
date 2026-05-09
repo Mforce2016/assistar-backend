@@ -1,8 +1,14 @@
 from flask import Blueprint, request, jsonify
+
 from services.firebase_service import db
+from services.firebase_service import asegurar_usuario
 
 auth_bp = Blueprint("auth", __name__)
 
+
+# =========================================
+# LOGIN
+# =========================================
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
@@ -12,24 +18,56 @@ def login():
     usuario = data.get("usuario")
     clave = data.get("clave")
 
-    ref = db().collection("users").document(usuario)
+    ref = db.collection("users").document(usuario)
+
     doc = ref.get()
 
     if not doc.exists:
+
         return jsonify({
-            "success": False,
-            "error": "Usuario no existe"
+            "ok": False
         })
 
     datos = doc.to_dict()
 
     if datos["password"] != clave:
+
         return jsonify({
-            "success": False,
-            "error": "Contraseña incorrecta"
+            "ok": False
         })
 
     return jsonify({
-        "success": True,
-        "usuario": usuario
+        "ok": True
+    })
+
+
+# =========================================
+# REGISTER
+# =========================================
+
+@auth_bp.route("/register", methods=["POST"])
+def register():
+
+    data = request.json
+
+    usuario = data.get("usuario")
+    clave = data.get("clave")
+
+    ref = db.collection("users").document(usuario)
+
+    if ref.get().exists:
+
+        return jsonify({
+            "ok": False
+        })
+
+    ref.set({
+        "usuario": usuario,
+        "password": clave
+    })
+
+    asegurar_usuario(usuario)
+
+    return jsonify({
+        "ok": True
     })
