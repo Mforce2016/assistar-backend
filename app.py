@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-
+from routes.license_routes import license_bp
 from routes.auth_routes import auth_bp
 from routes.ia_routes import ia_bp
 from routes.payment_routes import payment_bp
@@ -16,7 +16,7 @@ CORS(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(ia_bp)
 app.register_blueprint(payment_bp)
-
+app.register_blueprint(license_bp)
 # ======================================
 # TEST ONLINE
 # ======================================
