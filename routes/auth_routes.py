@@ -18,7 +18,7 @@ def login():
     usuario = data.get("usuario")
     clave = data.get("clave")
 
-    ref = db.collection("users").document(usuario)
+    ref = db().collection("users").document(usuario)
 
     doc = ref.get()
 
@@ -53,7 +53,7 @@ def register():
     usuario = data.get("usuario")
     clave = data.get("clave")
 
-    ref = db.collection("users").document(usuario)
+    ref = db().collection("users").document(usuario)
 
     if ref.get().exists:
 
