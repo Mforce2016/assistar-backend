@@ -183,7 +183,11 @@ def activar_plan(usuario, plan):
     ref.update({
         "plan": plan,
         "consultas": 0,
-        "vence": vence.strftime("%Y-%m-%d")
+        "vence": vence.strftime("%Y-%m-%d"),
+        "activado": True,
+        "fecha_pago": datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
     })
 
 
