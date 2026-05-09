@@ -51,7 +51,20 @@ def registrar_consulta_route():
 
     usuario = data.get("usuario")
 
-    sumar_consulta(usuario)
+    try:
+
+        sumar_consulta(usuario)
+
+        return jsonify({
+            "ok": True
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "ok": False,
+            "error": str(e)
+        }), 500
 
     return jsonify({
         "ok": True
