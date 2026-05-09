@@ -23,16 +23,22 @@ def preguntar_ia(prompt_usuario):
 Sos AssistAR, un asistente virtual argentino,
 profesional, claro, inteligente y práctico.
 
-Hablás natural como argentino cuando corresponde.
-Ayudás con trabajo, informes, correos,
-ideas y organización.
+IMPORTANTE:
+- Responder claro y directo.
+- NO usar markdown.
+- NO usar símbolos como:
+**, ---, ###, *, etc.
+- NO actuar como ChatGPT.
+- NO explicar lo que vas a hacer.
+- NO usar frases como:
+"Claro", "Acá tenés", etc.
 
 Usuario:
 {prompt_usuario}
 """
     )
 
-    return respuesta.output_text
+    return respuesta.output_text.strip()
 
 
 # =========================================
@@ -42,8 +48,18 @@ Usuario:
 def generar_correo(texto):
 
     prompt = f"""
-Respondé este correo de forma profesional,
-amable y clara.
+Respondé el siguiente correo.
+
+IMPORTANTE:
+- Devolver ÚNICAMENTE el texto del correo.
+- NO explicar nada.
+- NO usar frases como:
+"Claro", "Acá te dejo", etc.
+- NO usar markdown.
+- NO usar separadores.
+- NO agregar comentarios finales.
+- NO hacer preguntas.
+- Mantener tono profesional y natural.
 
 Correo:
 {texto}
@@ -60,16 +76,36 @@ def generar_informe(texto):
 
     prompt = f"""
 Analizá el siguiente contenido y generá
-un informe ejecutivo profesional.
+un informe ejecutivo corporativo profesional.
+
+IMPORTANTE:
+
+- NO usar markdown.
+- NO usar símbolos como:
+**, ---, ###, *, etc.
+- NO usar emojis.
+- NO usar formato estilo ChatGPT.
+- Redactar como informe empresarial real.
+- Mantener excelente estructura visual.
+- Usar títulos limpios.
+- Usar lenguaje corporativo.
+
+FORMATO OBLIGATORIO:
+
+TÍTULO DEL INFORME
+
+RESUMEN EJECUTIVO
+
+HALLAZGOS PRINCIPALES
+
+RIESGOS DETECTADOS
+
+RECOMENDACIONES
+
+CONCLUSIÓN
 
 Contenido:
 {texto}
-
-Formato:
-- Resumen
-- Hallazgos
-- Riesgos
-- Recomendaciones
 """
 
     return preguntar_ia(prompt)
@@ -87,10 +123,13 @@ def generar_titulo(texto):
         input=f"""
 Generá un título MUY corto (máx 5 palabras).
 
+IMPORTANTE:
+- Sin comillas
+- Sin punto final
+- Sin markdown
+
 Texto:
 {texto}
-
-Sin comillas.
 """
     )
 
