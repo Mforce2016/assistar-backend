@@ -5,3 +5,5 @@ python-dotenv
 firebase-admin
 mercadopago
 gunicorn
+requests
+pyrebase4
