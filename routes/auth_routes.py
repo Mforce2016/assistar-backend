@@ -1,6 +1,10 @@
 from flask import Blueprint, request, jsonify
 
-from services.firebase_auth_service import verify_email
+from services.firebase_auth_service import (
+    register_user,
+    login_user,
+    reset_password
+)
 from services.firebase_service import (
     asegurar_usuario
 )
