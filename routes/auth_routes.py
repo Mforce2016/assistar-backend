@@ -1,73 +1,165 @@
 from flask import Blueprint, request, jsonify
 
-from services.firebase_service import db
-from services.firebase_service import asegurar_usuario
+from services.firebase_auth_service import verify_email
+from services.firebase_service import (
+    asegurar_usuario
+)
 
-auth_bp = Blueprint("auth", __name__)
-
-
-# =========================================
-# LOGIN
-# =========================================
-
-@auth_bp.route("/login", methods=["POST"])
-def login():
-
-    data = request.json
-
-    usuario = data.get("usuario")
-    clave = data.get("clave")
-
-    ref = db().collection("users").document(usuario)
-
-    doc = ref.get()
-
-    if not doc.exists:
-
-        return jsonify({
-            "ok": False
-        })
-
-    datos = doc.to_dict()
-
-    if datos["password"] != clave:
-
-        return jsonify({
-            "ok": False
-        })
-
-    return jsonify({
-        "ok": True
-    })
-
+auth_bp = Blueprint(
+    "auth",
+    __name__
+)
 
 # =========================================
 # REGISTER
 # =========================================
 
-@auth_bp.route("/register", methods=["POST"])
+@auth_bp.route(
+    "/register",
+    methods=["POST"]
+)
 def register():
 
-    data = request.json
+    try:
 
-    usuario = data.get("usuario")
-    clave = data.get("clave")
+        data = request.json
 
-    ref = db().collection("users").document(usuario)
+        email = data.get("email")
+        password = data.get("password")
 
-    if ref.get().exists:
+        result = register_user(
+            email,
+            password
+        )
+
+        if "error" in result:
+
+            return jsonify({
+                "ok": False,
+                "error": result["error"]["message"]
+            })
+
+        asegurar_usuario(email)
+
+        id_token = result["idToken"]
+
+        send_verify_email(id_token)
 
         return jsonify({
-            "ok": False
+            "ok": True
         })
 
-    ref.set({
-        "usuario": usuario,
-        "password": clave
-    })
+    except Exception as e:
 
-    asegurar_usuario(usuario)
+        return jsonify({
+            "ok": False,
+            "error": str(e)
+        })
 
-    return jsonify({
-        "ok": True
-    })
+# =========================================
+# LOGIN
+# =========================================
+
+@auth_bp.route(
+    "/login",
+    methods=["POST"]
+)
+def login():
+
+    try:
+
+        data = request.json
+
+        email = data.get("email")
+        password = data.get("password")
+
+        result = login_user(
+            email,
+            password
+        )
+
+        if "error" in result:
+
+            return jsonify({
+                "ok": False,
+                "error": result["error"]["message"]
+            })
+
+        info = get_account_info(
+            result["idToken"]
+        )
+
+        usuarios = info.get(
+            "users",
+            []
+        )
+
+        if not usuarios:
+
+            return jsonify({
+                "ok": False,
+                "error": "USER_NOT_FOUND"
+            })
+
+        email_verified = usuarios[0].get(
+            "emailVerified",
+            False
+        )
+
+        if not email_verified:
+
+            return jsonify({
+                "ok": False,
+                "error": "EMAIL_NOT_VERIFIED"
+            })
+
+        return jsonify({
+            "ok": True,
+            "token": result["idToken"],
+            "email": email
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "ok": False,
+            "error": str(e)
+        })
+
+# =========================================
+# RECUPERAR PASSWORD
+# =========================================
+
+@auth_bp.route(
+    "/reset_password",
+    methods=["POST"]
+)
+def reset_password():
+
+    try:
+
+        data = request.json
+
+        email = data.get("email")
+
+        result = send_reset_email(
+            email
+        )
+
+        if "error" in result:
+
+            return jsonify({
+                "ok": False,
+                "error": result["error"]["message"]
+            })
+
+        return jsonify({
+            "ok": True
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "ok": False,
+            "error": str(e)
+        })

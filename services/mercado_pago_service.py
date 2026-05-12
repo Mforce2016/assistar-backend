@@ -1,14 +1,11 @@
 import mercadopago
 import os
 
+
 sdk = mercadopago.SDK(
     os.getenv("MP_ACCESS_TOKEN")
 )
 
-
-# =========================================
-# CREAR PAGO
-# =========================================
 
 def crear_pago(usuario, plan):
 
@@ -30,7 +27,7 @@ def crear_pago(usuario, plan):
         "external_reference": f"{usuario}|{plan}",
 
         "notification_url":
-            "https://assistar-backend.onrender.com/webhook_mp"
+        "https://assistar-backend.onrender.com/webhook_mp"
     }
 
     preference_response = sdk.preference().create(

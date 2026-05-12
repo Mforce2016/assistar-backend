@@ -36,7 +36,6 @@ def iniciar_firebase():
 
         firebase_admin.initialize_app(cred)
 
-
 # =====================================
 # DB
 # =====================================
@@ -44,7 +43,6 @@ def iniciar_firebase():
 def db():
     iniciar_firebase()
     return firestore.client()
-
 
 # =====================================
 # ASEGURAR USUARIO
@@ -70,7 +68,6 @@ def asegurar_usuario(usuario):
             )
         })
 
-
 # =====================================
 # OBTENER DATOS
 # =====================================
@@ -88,7 +85,6 @@ def obtener_datos(usuario):
 
     return None
 
-
 # =====================================
 # CONSULTAS RESTANTES
 # =====================================
@@ -105,7 +101,6 @@ def consultas_restantes(usuario):
         return 50 - datos["consultas"]
 
     return -1
-
 
 # =====================================
 # PUEDE CONSULTAR
@@ -138,6 +133,30 @@ def puede_consultar(usuario):
 
     return False
 
+# =====================================
+# OBTENER ESTADO USUARIO
+# =====================================
+
+def obtener_estado(usuario):
+
+    datos = obtener_datos(usuario)
+
+    if not datos:
+
+        return {
+            "puede_consultar": False,
+            "consultas_restantes": 0,
+            "plan": "none"
+        }
+
+    restantes = consultas_restantes(usuario)
+
+    return {
+        "puede_consultar": puede_consultar(usuario),
+        "consultas_restantes": restantes,
+        "plan": datos.get("plan", "trial"),
+        "vence": datos.get("vence", "")
+    }
 
 # =====================================
 # SUMAR CONSULTA

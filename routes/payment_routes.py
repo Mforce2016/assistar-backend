@@ -52,7 +52,11 @@ def webhook_mp():
 
         data = request.json
 
-        if data["type"] != "payment":
+        print("WEBHOOK RECIBIDO:")
+        print(data)
+
+        # validar tipo
+        if data.get("type") != "payment":
             return "ok", 200
 
         payment_id = data["data"]["id"]
@@ -63,23 +67,36 @@ def webhook_mp():
 
         payment = payment_info["response"]
 
-        status = payment["status"]
+        print("PAYMENT INFO:")
+        print(payment)
+
+        status = payment.get("status")
 
         if status != "approved":
+            print("Pago no aprobado")
             return "ok", 200
 
-        external_reference = payment[
+        external_reference = payment.get(
             "external_reference"
-        ]
+        )
+
+        if not external_reference:
+            print("Sin external_reference")
+            return "ok", 200
 
         usuario, plan = external_reference.split("|")
 
         activar_plan(usuario, plan)
 
+        print(
+            f"PLAN ACTIVADO: {usuario} -> {plan}"
+        )
+
         return "ok", 200
 
     except Exception as e:
 
+        print("ERROR WEBHOOK:")
         print(str(e))
 
         return "error", 500

@@ -53,10 +53,18 @@ def registrar_consulta_route():
 
     try:
 
+        # sumar consulta
         sumar_consulta(usuario)
 
+        # verificar acceso actualizado
+        permitido = puede_consultar(usuario)
+
+        restantes = consultas_restantes(usuario)
+
         return jsonify({
-            "ok": True
+            "ok": True,
+            "permitido": permitido,
+            "restantes": restantes
         })
 
     except Exception as e:
@@ -65,10 +73,6 @@ def registrar_consulta_route():
             "ok": False,
             "error": str(e)
         }), 500
-
-    return jsonify({
-        "ok": True
-    })
 
 
 # =========================================
@@ -85,11 +89,17 @@ def estado_usuario_route():
 
     usuario = data.get("usuario")
 
+    asegurar_usuario(usuario)
+
     datos = obtener_datos(usuario)
 
     restantes = consultas_restantes(usuario)
 
+    permitido = puede_consultar(usuario)
+
     return jsonify({
-        "plan": datos["plan"],
-        "restantes": restantes
+        "plan": datos.get("plan", "trial"),
+        "restantes": restantes,
+        "permitido": permitido,
+        "vence": datos.get("vence", "")
     })
