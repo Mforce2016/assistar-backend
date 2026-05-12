@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 
-from backend.services.openai_service import (
+from services.openai_service import (
     preguntar_ia,
     generar_correo,
     generar_informe,
