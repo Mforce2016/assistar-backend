@@ -4,6 +4,8 @@ from routes.license_routes import license_bp
 from routes.auth_routes import auth_bp
 from routes.ia_routes import ia_bp
 from routes.payment_routes import payment_bp
+from routes.emotional_routes import emotional_bp
+from routes.payment_tokens_routes import tokens_bp
 
 app = Flask(__name__)
 
@@ -12,6 +14,15 @@ CORS(app)
 # ======================================
 # BLUEPRINTS
 # ======================================
+app.register_blueprint(
+    emotional_bp,
+    url_prefix="/emocional"
+)
+
+app.register_blueprint(
+    tokens_bp,
+    url_prefix="/tokens"
+)
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(ia_bp)
@@ -24,7 +35,7 @@ app.register_blueprint(license_bp)
 @app.route("/")
 def home():
     return {
-        "status": "Backend AssistAR online"
+        "status": "Backend online"
     }
 
 # ======================================
