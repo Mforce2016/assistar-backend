@@ -4,7 +4,7 @@ import json
 from openai import OpenAI
 from datetime import datetime
 from firebase_admin import firestore
-from firebase_service import db
+from services.firebase_service import db
 
 client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
