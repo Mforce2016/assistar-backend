@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import request
 from flask import jsonify
-from emotional_ai_service import (
+from services.emotional_ai_service import (
     preguntar_ia_emocional,
     obtener_versiculo_dia,
     obtener_fichas
@@ -80,4 +80,18 @@ def versiculo_dia():
     return jsonify({
         "ok": True,
         "versiculo": data
+    })
+
+# =========================================
+# TEST
+# =========================================
+
+@emotional_bp.route(
+    "/test",
+    methods=["GET"]
+)
+def emotional_test():
+
+    return jsonify({
+        "status": "Emotional routes online"
     })

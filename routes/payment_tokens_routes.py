@@ -1,15 +1,12 @@
 from flask import Blueprint
 from flask import request
 from flask import jsonify
-
 import mercadopago
 import os
-
-from token_payment_service import (
+from services.token_payment_service import (
     crear_pago_fichas
 )
-
-from firebase_service import (
+from services.firebase_service import (
     sumar_fichas
 )
 
