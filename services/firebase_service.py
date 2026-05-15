@@ -223,3 +223,21 @@ def bloquear_usuario(usuario):
     ref.update({
         "plan": "bloqueado"
     })
+    
+# =====================================
+# SUMAR FICHAS
+# =====================================
+
+def sumar_fichas(
+    uid,
+    cantidad
+):
+
+    ref = db().collection(
+        "users"
+    ).document(uid)
+
+    ref.update({
+        "fichas":
+            firestore.Increment(cantidad)
+    })
