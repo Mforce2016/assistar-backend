@@ -8,6 +8,7 @@ from routes.emotional_routes import emotional_bp
 from routes.payment_tokens_routes import tokens_bp
 from routes.mp_routes import mp_bp
 from routes.fcm_routes import fcm_bp
+from services.emotional_scheduler import scheduler
 
 app = Flask(__name__)
 
