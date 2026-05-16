@@ -6,6 +6,7 @@ from routes.ia_routes import ia_bp
 from routes.payment_routes import payment_bp
 from routes.emotional_routes import emotional_bp
 from routes.payment_tokens_routes import tokens_bp
+from routes.mp_routes import mp_bp
 
 app = Flask(__name__)
 
@@ -23,7 +24,10 @@ app.register_blueprint(
     tokens_bp,
     url_prefix="/tokens"
 )
-
+app.register_blueprint(
+    mp_bp,
+    url_prefix="/mp"
+)
 app.register_blueprint(auth_bp)
 app.register_blueprint(ia_bp)
 app.register_blueprint(payment_bp)

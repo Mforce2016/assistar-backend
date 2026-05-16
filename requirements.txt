@@ -7,3 +7,4 @@ mercadopago
 gunicorn
 requests
 pyrebase4
+mercadopago==2.2.1
