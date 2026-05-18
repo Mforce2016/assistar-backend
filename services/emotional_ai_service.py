@@ -113,22 +113,25 @@ def preguntar_ia_emocional(
     mensaje
 ):
 
-    fichas = obtener_fichas(uid)
+    try:
 
-    if fichas <= 0:
+        fichas = obtener_fichas(uid)
 
-        return {
-            "ok": False,
-            "error": "SIN_FICHAS"
-        }
+        if fichas <= 0:
 
-    historial = obtener_historial(uid)
+            return {
+                "ok": False,
+                "error": "SIN_FICHAS",
+                "respuesta": "Te quedaste sin fichas."
+            }
 
-    mensajes_contexto = []
+        historial = obtener_historial(uid)
 
-    mensajes_contexto.append({
-        "role": "system",
-        "content": """
+        mensajes_contexto = []
+
+        mensajes_contexto.append({
+            "role": "system",
+            "content": """
 Sos un acompañante emocional y espiritual.
 
 Tu objetivo es:
@@ -160,6 +163,10 @@ Debés devolver SIEMPRE un JSON válido con esta estructura:
   "versiculo_referencia": "..."
 }
 
+NO agregues texto fuera del JSON.
+NO uses bloques markdown.
+NO uses ```json.
+
 Si detectás:
 - suicidio
 - autolesión
@@ -170,102 +177,139 @@ debés:
 - recomendar ayuda profesional
 - recomendar contacto humano inmediato
 """
-    })
+        })
 
-    for item in historial:
+        for item in historial:
+
+            mensajes_contexto.append({
+                "role": "user",
+                "content": item["mensaje"]
+            })
+
+            mensajes_contexto.append({
+                "role": "assistant",
+                "content": item["respuesta"]
+            })
 
         mensajes_contexto.append({
             "role": "user",
-            "content": item["mensaje"]
+            "content": mensaje
         })
 
-        mensajes_contexto.append({
-            "role": "assistant",
-            "content": item["respuesta"]
-        })
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=mensajes_contexto,
+            temperature=0.8,
+            max_tokens=300
+        )
 
-    mensajes_contexto.append({
-        "role": "user",
-        "content": mensaje
-    })
+        texto = (
+            response
+            .choices[0]
+            .message
+            .content
+        )
 
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=mensajes_contexto,
-        temperature=0.8
-    )
+        if texto is None:
+            texto = ""
 
-    texto = response.choices[0].message.content.strip()
+        texto = texto.strip()
 
-    print("RESPUESTA OPENAI:")
-    print(texto)
+        print("========== OPENAI RESPONSE ==========")
+        print(texto)
+        print("=====================================")
 
-    # LIMPIAR markdown json
-    texto = texto.replace("```json", "")
-    texto = texto.replace("```", "")
-    texto = texto.strip()
+        # LIMPIAR markdown
+        texto = texto.replace(
+            "```json",
+            ""
+        )
 
-    try:
+        texto = texto.replace(
+            "```",
+            ""
+        )
 
-        data = json.loads(texto)
+        texto = texto.strip()
+
+        try:
+
+            data = json.loads(texto)
+
+        except Exception as e:
+
+            print("ERROR JSON:", str(e))
+
+            data = {
+                "respuesta":
+                    texto if texto else
+                    "Ahora mismo no pude responderte correctamente.",
+                "emocion": "neutral",
+                "versiculo_texto": "",
+                "versiculo_referencia": ""
+            }
+
+        respuesta_final = data.get(
+            "respuesta",
+            ""
+        )
+
+        if not respuesta_final:
+
+            respuesta_final = (
+                "Estoy acá con vos. "
+                "Contame un poco más cómo te sentís."
+            )
+
+        guardar_historial(
+            uid,
+            mensaje,
+            respuesta_final,
+            data.get(
+                "emocion",
+                "neutral"
+            )
+        )
+
+        descontar_ficha(uid)
+
+        return {
+
+            "ok": True,
+
+            "respuesta": respuesta_final,
+
+            "emocion": data.get(
+                "emocion",
+                "neutral"
+            ),
+
+            "versiculo": {
+
+                "texto": data.get(
+                    "versiculo_texto",
+                    ""
+                ),
+
+                "referencia": data.get(
+                    "versiculo_referencia",
+                    ""
+                )
+            },
+
+            "fichas_restantes": fichas - 1
+        }
 
     except Exception as e:
 
-        print("ERROR JSON:", e)
+        print("ERROR GENERAL IA:")
+        print(str(e))
 
-        data = {
-            "respuesta": texto if texto else "Ahora mismo no pude responderte correctamente.",
-            "emocion": "neutral",
-            "versiculo_texto": "",
-            "versiculo_referencia": ""
+        return {
+            "ok": False,
+            "respuesta": "Ocurrió un problema al conectar con la IA.",
+            "error": str(e)
         }
-
-    guardar_historial(
-        uid,
-        mensaje,
-        data["respuesta"],
-        data["emocion"]
-    )
-
-    descontar_ficha(uid)
-
-    respuesta_final = data.get(
-        "respuesta",
-        ""
-    )
-
-    if not respuesta_final:
-        respuesta_final = (
-            "Estoy acá con vos. "
-            "Contame un poco más cómo te sentís."
-        )
-
-    return {
-
-        "ok": True,
-
-        "respuesta": respuesta_final,
-
-        "emocion": data.get(
-            "emocion",
-            "neutral"
-        ),
-
-        "versiculo": {
-
-            "texto": data.get(
-                "versiculo_texto",
-                ""
-            ),
-
-            "referencia": data.get(
-                "versiculo_referencia",
-                ""
-            )
-        },
-
-        "fichas_restantes": fichas - 1
-    }
 
 
 # =========================================
