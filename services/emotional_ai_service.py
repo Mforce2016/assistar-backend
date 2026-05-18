@@ -17,11 +17,18 @@ client = OpenAI(
 
 def obtener_fichas(uid):
 
+    print("UID RECIBIDO:", uid)
+
     ref = db().collection(
         "users"
     ).document(uid)
 
     doc = ref.get()
+
+    print("EXISTE DOC:", doc.exists)
+
+    if doc.exists:
+        print("DATA:", doc.to_dict())
 
     if not doc.exists:
         return 0
