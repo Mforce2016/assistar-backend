@@ -195,16 +195,26 @@ debés:
         temperature=0.8
     )
 
-    texto = response.choices[0].message.content
+    texto = response.choices[0].message.content.strip()
+
+    print("RESPUESTA OPENAI:")
+    print(texto)
+
+    # LIMPIAR markdown json
+    texto = texto.replace("```json", "")
+    texto = texto.replace("```", "")
+    texto = texto.strip()
 
     try:
 
         data = json.loads(texto)
 
-    except:
+    except Exception as e:
+
+        print("ERROR JSON:", e)
 
         data = {
-            "respuesta": texto,
+            "respuesta": texto if texto else "Ahora mismo no pude responderte correctamente.",
             "emocion": "neutral",
             "versiculo_texto": "",
             "versiculo_referencia": ""
@@ -219,14 +229,41 @@ debés:
 
     descontar_ficha(uid)
 
+    respuesta_final = data.get(
+        "respuesta",
+        ""
+    )
+
+    if not respuesta_final:
+        respuesta_final = (
+            "Estoy acá con vos. "
+            "Contame un poco más cómo te sentís."
+        )
+
     return {
+
         "ok": True,
-        "respuesta": data["respuesta"],
-        "emocion": data["emocion"],
+
+        "respuesta": respuesta_final,
+
+        "emocion": data.get(
+            "emocion",
+            "neutral"
+        ),
+
         "versiculo": {
-            "texto": data["versiculo_texto"],
-            "referencia": data["versiculo_referencia"]
+
+            "texto": data.get(
+                "versiculo_texto",
+                ""
+            ),
+
+            "referencia": data.get(
+                "versiculo_referencia",
+                ""
+            )
         },
+
         "fichas_restantes": fichas - 1
     }
 
