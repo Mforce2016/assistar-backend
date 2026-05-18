@@ -204,10 +204,18 @@ debés:
         })
 
         response = client.chat.completions.create(
+
             model="gpt-4.1-mini",
+
             messages=mensajes_contexto,
+
             temperature=0.8,
-            max_tokens=300
+
+            max_tokens=300,
+
+            response_format={
+                "type": "json_object"
+            }
         )
 
         texto = (
@@ -238,6 +246,19 @@ debés:
         )
 
         texto = texto.strip()
+
+        # EXTRAER SOLO EL JSON
+        inicio = texto.find("{")
+        fin = texto.rfind("}")
+
+        if inicio != -1 and fin != -1:
+            texto = texto[
+                inicio:fin + 1
+            ]
+
+        print("========== JSON LIMPIO ==========")
+        print(texto)
+        print("=================================")
 
         try:
 
