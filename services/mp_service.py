@@ -8,22 +8,22 @@ sdk = mercadopago.SDK(
 PACKS = {
     "10": {
         "fichas": 10,
-        "precio": 2000
+        "precio": 1000
     },
 
     "30": {
         "fichas": 30,
-        "precio": 4000
+        "precio": 2000
     },
 
     "50": {
         "fichas": 50,
-        "precio": 7000
+        "precio": 4000
     },
 
     "100": {
         "fichas": 100,
-        "precio": 15000
+        "precio": 8000
     }
 }
 
@@ -38,7 +38,7 @@ def crear_preferencia(uid, pack_id):
     preference_data = {
         "items": [
             {
-                "title": f"{pack['fichas']} fichas InspirAR IA",
+                "title": f"{pack['fichas']} fichas Sou",
                 "quantity": 1,
                 "currency_id": "ARS",
                 "unit_price": pack["precio"]
