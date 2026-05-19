@@ -38,10 +38,10 @@ def crear_preferencia(uid, pack_id):
     preference_data = {
         "items": [
             {
-                "title": f"{pack['fichas']} fichas Sou",
+                "title": f"{pack['fichas']} fichas Soul IA",
                 "quantity": 1,
                 "currency_id": "ARS",
-                "unit_price": pack["precio"]
+                "unit_price": float(pack["precio"])
             }
         ],
 
@@ -67,5 +67,6 @@ def crear_preferencia(uid, pack_id):
     )
 
     preference = preference_response["response"]
+    print(preference_response["response"])
 
     return preference["init_point"]
