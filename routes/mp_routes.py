@@ -97,27 +97,67 @@ def webhook():
         print("HEADERS:", request.headers)
 
         # ====================================
+        # IGNORAR MERCHANT ORDER
+        # ====================================
+
+        topic = request.args.get("topic")
+
+        if topic == "merchant_order":
+            print("Merchant order ignorado")
+
+            return "ok", 200
+
+        # ====================================
         # OBTENER PAYMENT ID
         # ====================================
 
+        payment_id = None
+
+        # 1. query params modernos
         payment_id = request.args.get(
             "data.id"
         )
 
-        # Si no vino por query params
-        # intentar obtenerlo del JSON
+        # 2. query params antiguos
+        if not payment_id:
+            payment_id = request.args.get(
+                "id"
+            )
 
+        # 3. body json
         if not payment_id:
 
             data = request.json
 
             if not data:
-
                 print("No llegaron datos")
 
-                return "no data", 400
+                return "ok", 200
 
-            payment_id = data["data"]["id"]
+            # formato moderno
+            if "data" in data:
+
+                payment_id = data["data"].get(
+                    "id"
+                )
+
+            # formato antiguo
+            elif "resource" in data:
+
+                resource = data["resource"]
+
+                # puede venir URL o ID directo
+                if isinstance(resource, str):
+                    payment_id = resource.split("/")[-1]
+
+        # ====================================
+        # VALIDAR ID
+        # ====================================
+
+        if not payment_id:
+            print("No se pudo obtener payment_id")
+
+            return "ok", 200
 
         print("PAYMENT ID:", payment_id)
 
